@@ -1,8 +1,8 @@
 def find_best_move(game):
     best_score = float('-inf')
     best_move = None
-    for row in range(16):
-        for col in range(16):
+    for row in range(game.size):
+        for col in range(game.size):
             if game.is_valid_move(row, col):
                 game.make_move(row, col)
                 score = minimax(game, 0, False, float('-inf'), float('inf'))
@@ -14,13 +14,15 @@ def find_best_move(game):
 
 
 def minimax(game, depth, is_maximizing, alpha, beta):
-    if depth == 0 or game.check_win_condition():
-        return game.evaluate_board()
+    if game.check_win():
+        return 1000 if is_maximizing else -1000
+    if depth == 0:
+        return evaluate_board(game)
 
     if is_maximizing:
         max_eval = float('-inf')
-        for row in range(16):
-            for col in range(16):
+        for row in range(game.size):
+            for col in range(game.size):
                 if game.is_valid_move(row, col):
                     game.make_move(row, col)
                     evaluation = minimax(game, depth - 1, False, alpha, beta)
@@ -34,8 +36,8 @@ def minimax(game, depth, is_maximizing, alpha, beta):
         return max_eval
     else:
         min_eval = float('inf')
-        for row in range(16):
-            for col in range(16):
+        for row in range(game.size):
+            for col in range(game.size):
                 if game.is_valid_move(row, col):
                     game.make_move(row, col)
                     evaluation = minimax(game, depth - 1, True, alpha, beta)
@@ -49,23 +51,14 @@ def minimax(game, depth, is_maximizing, alpha, beta):
         return min_eval
 
 
-def check_win(self, row, col):
-    player = self.board[row][col]
-    # Horizontal, vertical, deux diagonales
-    for direction in [(0, 1), (1, 0), (1, 1), (1, -1)]:
-        count = 1
-        for d in [1, -1]:  # Deux directions pour chaque ligne/colonne/diagonale
-            for step in range(1, 5):  # Vérifier jusqu'à 4 pions de chaque côté
-                r, c = row + step * direction[0] * \
-                    d, col + step * direction[1] * d
-                if 0 <= r < self.size and 0 <= c < self.size and self.board[r][c] == player:
-                    count += 1
-                else:
-                    break
-            if count >= 5:  # Vous pouvez ajuster ce nombre selon les règles de votre jeu
-                return True
-    return False
-
-
-def undo_move(self, row, col):
-    self.board[row][col] = ' '
+def evaluate_board(game):
+    score = 0
+    # Exemple : +10 pour chaque séquence de 3 'X' ou 'O' sans blocage, -10 pour l'adversaire
+    # Vous pouvez développer cela avec des scores pour différentes configurations
+    for row in range(game.size):
+        for col in range(game.size):
+            if game.board[row][col] == game.current_player:
+                score += 10  # ou une autre logique basée sur la configuration autour de cette pièce
+            elif game.board[row][col] != ' ':
+                score -= 10  # ajuster pour l'opposant
+    return score
