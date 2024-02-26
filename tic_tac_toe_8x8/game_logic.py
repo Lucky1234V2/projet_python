@@ -21,11 +21,21 @@ class Game:
     def is_valid_move(self, row, col):
         return self.board[row][col] == ' '
 
+    # Dans Game, ajoutez cette méthode pour obtenir tous les mouvements valides
+
+    def get_valid_moves(self):
+        valid_moves = []
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.board[row][col] == ' ':
+                    valid_moves.append((row, col))
+        return valid_moves
+
     def switch_player(self):
         self.current_player = 'O' if self.current_player == 'X' else 'X'
 
     def check_win(self):
-        # Vérifie toutes les rangées, colonnes et diagonales
+        # Vérifie toutes les rangées, colonnes et diagonales pour une victoire
         for row in range(self.size):
             if self.check_line_win([self.board[row][col] for col in range(self.size)]):
                 return True
@@ -53,3 +63,26 @@ class Game:
             if consecutive_count >= self.win_length:
                 return True
         return False
+
+    def is_game_over(self):
+        if self.check_win():  # Si un joueur a gagné
+            return True
+        for row in self.board:
+            if ' ' in row:  # S'il reste des mouvements valides
+                return False
+        return True  # Le plateau est plein, donc le jeu est terminé
+
+    def get_all_lines(self):
+        # Cette méthode devrait renvoyer toutes les lignes, colonnes et diagonales pour l'évaluation
+        lines = []
+        # Ajouter les lignes horizontales et verticales
+        for i in range(self.size):
+            lines.append(self.board[i])  # lignes horizontales
+            lines.append([self.board[j][i]
+                         for j in range(self.size)])  # lignes verticales
+
+        # Ajouter les diagonales
+        diagonals = [[self.board[i][i] for i in range(self.size)], [
+            self.board[i][self.size-1-i] for i in range(self.size)]]
+        lines.extend(diagonals)
+        return lines
