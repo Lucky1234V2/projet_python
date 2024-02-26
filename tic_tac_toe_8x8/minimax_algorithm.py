@@ -1,5 +1,6 @@
 def minimax(board, depth, alpha, beta, is_maximizing_player):
     if board.is_game_over() or depth == 0:
+        # Assurez-vous que evaluate_board retourne toujours une valeur numérique.
         return evaluate_board(board)
 
     if is_maximizing_player:
@@ -12,7 +13,7 @@ def minimax(board, depth, alpha, beta, is_maximizing_player):
             max_eval = max(max_eval, eval)
             alpha = max(alpha, eval)
             if beta <= alpha:
-                break  # Élagage alpha-bêta
+                break
         return max_eval
     else:
         min_eval = float('inf')
@@ -24,7 +25,7 @@ def minimax(board, depth, alpha, beta, is_maximizing_player):
             min_eval = min(min_eval, eval)
             beta = min(beta, eval)
             if beta <= alpha:
-                break  # Élagage alpha-bêta
+                break
         return min_eval
 
 
@@ -33,11 +34,7 @@ def find_best_move(board, depth=6):
     best_move = None
     alpha = float('-inf')
     beta = float('inf')
-    valid_moves = board.get_valid_moves()
-    # Trie les mouvements en fonction de leur évaluation potentielle
-    sorted_moves = sorted(
-        valid_moves, key=lambda move: evaluate_move(board, move), reverse=True)
-    for move in sorted_moves:
+    for move in board.get_valid_moves():
         row, col = move
         board.make_move(row, col)
         eval = minimax(board, depth - 1, alpha, beta, False)
@@ -48,32 +45,20 @@ def find_best_move(board, depth=6):
         alpha = max(alpha, eval)
     return best_move
 
-# Une fonction pour évaluer le potentiel d'un mouvement
-
-
-def evaluate_move(board, move):
-    row, col = move
-    board.make_move(row, col)
-    score = evaluate_board(board)
-    board.undo_move(row, col)
-    return score
-
-# La fonction d'évaluation de la position du plateau
-
 
 def evaluate_board(board):
-    score = 0
-    lines_to_check = board.get_all_lines()
-    for line in lines_to_check:
-        x_count = line.count('X')
-        o_count = line.count('O')
-        if x_count >= board.win_length - 1:  # Détecter les menaces de l'adversaire
-            score -= 100
-        if o_count >= board.win_length - 1:  # Rechercher les opportunités de gagner
-            score += 100
-        # Détecter les opportunités de former une ligne gagnante
-        if x_count == board.win_length - 2 and ' ' in line:
-            score -= 50
-        if o_count == board.win_length - 2 and ' ' in line:  # Détecter les menaces de l'adversaire
-            score += 50
-    return score
+    # Hypothèse: board est une matrice 8x8 et board[x][y] retourne l'état de la case (par ex., vide, 'X', ou 'O')
+
+    # Constantes pour les scores
+    WIN_SCORE = 100
+    LOSE_SCORE = -100
+
+    # Vérifie si le jeu est terminé et qui a gagné pour attribuer un score simple
+    if board.is_winner('O'):  # Adaptez cette condition à votre implémentation
+        return WIN_SCORE
+    elif board.is_winner('X'):  # Adaptez cette condition à votre implémentation
+        return LOSE_SCORE
+    else:
+        # Pour une évaluation plus sophistiquée, considérez le nombre de séquences partielles (par ex., deux ou trois en ligne)
+        # et ajustez les scores en conséquence. Cela peut nécessiter une logique plus complexe.
+        return 0  # Retourne un score neutre si le jeu n'est pas encore décidé
