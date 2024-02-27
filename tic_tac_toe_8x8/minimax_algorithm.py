@@ -29,7 +29,7 @@ def minimax(board, depth, alpha, beta, is_maximizing_player):
         return min_eval
 
 
-def find_best_move(board, depth=6):
+def find_best_move(board, depth=4):
     best_eval = float('-inf')
     best_move = None
     alpha = float('-inf')
