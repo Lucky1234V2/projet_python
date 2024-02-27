@@ -94,3 +94,11 @@ class TicTacToe:
             else:
                 break
         return count == 4
+
+    def get_game_over_message(self):
+        if self.check_win('X'):
+            return "Player X wins!"
+        elif self.check_win('O'):
+            return "Player O wins!"
+        else:
+            return "The game is a tie!"

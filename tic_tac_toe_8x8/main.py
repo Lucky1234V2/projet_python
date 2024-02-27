@@ -19,7 +19,6 @@ def main():
                 row, col = move
                 game.make_move(row, col)
             else:
-                print("No valid moves left. Game Over.")
                 break
 
         if game.check_win(game.current_player):
@@ -32,6 +31,9 @@ def main():
 
         # Switch player is handled inside make_move, so it's no longer needed here
         # game.switch_player() # This function doesn't exist in the provided code and isn't needed
+    if game.is_game_over():
+        game.print_board()
+        print(game.get_game_over_message())
 
 
 if __name__ == "__main__":
