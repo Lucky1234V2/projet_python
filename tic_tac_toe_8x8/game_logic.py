@@ -1,8 +1,16 @@
+import tkinter as tk
+from tkinter import messagebox
+
+from minimax_algorithm import find_best_move
+
+
 class TicTacToe:
     def __init__(self):
         self.board = [[' ' for _ in range(8)] for _ in range(8)]
-        self.current_player = 'X'  # Ajoutez cette ligne pour initialiser le joueur courant
+        self.current_player = 'X'
         self.size = 8
+        self.gui = TicTacToeGUI(self)
+        self.gui.start()
 
     def is_winner(self, player):
         # Vérifier les lignes
@@ -31,14 +39,6 @@ class TicTacToe:
 
         return False
 
-    def print_board(self):
-        # Affiche l'état actuel du plateau de jeu
-        print('  ' + ' '.join(str(i) for i in range(self.size)))
-        print('+---' * self.size + '+')
-        for row in range(self.size):
-            print('| ' + ' | '.join(self.board[row]) + ' |')
-            print('+---' * self.size + '+')
-
     def make_move(self, row, col):
         if self.is_valid_move(row, col):
             self.board[row][col] = self.current_player
@@ -54,7 +54,6 @@ class TicTacToe:
         return 0 <= row < self.size and 0 <= col < self.size and self.board[row][col] == ' '
 
     def get_valid_moves(self):
-        # Optimisation : Privilégier les cases proches des jetons déjà placés pour réduire l'espace de recherche
         moves = []
         for row in range(self.size):
             for col in range(self.size):
@@ -64,7 +63,6 @@ class TicTacToe:
         return moves
 
     def get_neighbors(self, row, col):
-        # Renvoie les cases adjacentes (8 directions possibles)
         directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1),
                       (0, 1), (1, -1), (1, 0), (1, 1)]
         for dr, dc in directions:
@@ -72,11 +70,9 @@ class TicTacToe:
                 yield row + dr, col + dc
 
     def is_game_over(self):
-        # Vérifie si le jeu est terminé
         return self.check_win('X') or self.check_win('O') or all(self.board[row][col] != ' ' for row in range(self.size) for col in range(self.size))
 
     def check_win(self, player):
-        # Vérifie si le joueur a gagné
         for row in range(self.size):
             for col in range(self.size):
                 if any(self.check_line(row, col, dr, dc, player) for dr, dc in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]):
@@ -84,7 +80,6 @@ class TicTacToe:
         return False
 
     def check_line(self, row, col, dr, dc, player):
-        # Vérifie une ligne de 4 jetons du même joueur
         count = 0
         for _ in range(4):
             if 0 <= row < self.size and 0 <= col < self.size and self.board[row][col] == player:
@@ -102,3 +97,66 @@ class TicTacToe:
             return "Player O wins!"
         else:
             return "The game is a tie!"
+
+
+class TicTacToeGUI:
+    def __init__(self, game):
+        self.game = game
+        self.root = tk.Tk()
+        self.root.title("Tic Tac Toe")
+        self.board_buttons = []
+        self.create_board()
+
+    def create_board(self):
+        for row in range(8):
+            button_row = []
+            for col in range(8):
+                button = tk.Button(self.root, text=" ", width=4, height=2,
+                                   command=lambda r=row, c=col: self.make_move(r, c))
+                button.grid(row=row, column=col)
+                button_row.append(button)
+            self.board_buttons.append(button_row)
+
+    def make_move(self, row, col):
+        if self.game.is_valid_move(row, col):
+            self.game.make_move(row, col)
+            self.update_board()
+            if self.game.is_game_over():
+                self.show_result()
+            else:
+                self.update_turn_label()
+                self.make_ai_move()
+
+    def update_board(self):
+        for row in range(8):
+            for col in range(8):
+                self.board_buttons[row][col]['text'] = self.game.board[row][col]
+
+    def update_turn_label(self):
+        current_player = "Player X" if self.game.current_player == 'X' else "Player O"
+        self.root.title(f"Tic Tac Toe - {current_player}'s turn")
+
+    def make_ai_move(self):
+        if self.game.current_player == 'O':
+            move = find_best_move(self.game)
+            if move:
+                row, col = move
+                self.game.make_move(row, col)
+                self.update_board()
+                if self.game.is_game_over():
+                    self.show_result()
+                else:
+                    self.update_turn_label()
+
+    def show_result(self):
+        result = self.game.get_game_over_message()
+        messagebox.showinfo("Game Over", result)
+        self.root.quit()
+
+    def start(self):
+        self.update_turn_label()
+        self.root.mainloop()
+
+
+if __name__ == "__main__":
+    TicTacToe()
