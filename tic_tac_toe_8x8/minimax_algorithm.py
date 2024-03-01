@@ -49,13 +49,36 @@ def find_best_move(board, max_depth=2):
 
 
 def evaluate_board(board):
-
     WIN_SCORE = 100
     LOSE_SCORE = -100
+    TWO_IN_ROW_SCORE = 10
+    TWO_IN_ROW_OPPONENT_SCORE = -20
 
     if board.is_winner('O'):
         return WIN_SCORE
     elif board.is_winner('X'):
         return LOSE_SCORE
     else:
-        return 0
+        score = 0
+        # Parcourir le plateau pour évaluer les alignements de deux symboles
+        for row in range(board.size):
+            for col in range(board.size):
+                # Évaluer les alignements horizontaux, verticaux et diagonaux
+                if board.board[row][col] == ' ':
+                    # Vérifier les alignements horizontaux et verticaux
+                    if col <= 5 and board.board[row][col + 1] == board.board[row][col + 2] != ' ':
+                        score += TWO_IN_ROW_SCORE if board.board[row][col +
+                                                                      1] == 'O' else TWO_IN_ROW_OPPONENT_SCORE
+                    if row <= 5 and board.board[row + 1][col] == board.board[row + 2][col] != ' ':
+                        score += TWO_IN_ROW_SCORE if board.board[row +
+                                                                 1][col] == 'O' else TWO_IN_ROW_OPPONENT_SCORE
+
+                    # Vérifier les alignements diagonaux
+                    if row <= 5 and col <= 5 and board.board[row + 1][col + 1] == board.board[row + 2][col + 2] != ' ':
+                        score += TWO_IN_ROW_SCORE if board.board[row +
+                                                                 1][col + 1] == 'O' else TWO_IN_ROW_OPPONENT_SCORE
+                    if row >= 2 and col <= 5 and board.board[row - 1][col + 1] == board.board[row - 2][col + 2] != ' ':
+                        score += TWO_IN_ROW_SCORE if board.board[row -
+                                                                 1][col + 1] == 'O' else TWO_IN_ROW_OPPONENT_SCORE
+
+        return score
