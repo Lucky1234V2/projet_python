@@ -42,10 +42,3 @@ Un rapport détaillé doit être rédigé concernant le projet de planification,
 
 Chaque dossier contenant un script `main.py` peut être exécuté indépendamment. Assurez-vous d'être dans le bon dossier avant d'exécuter la commande correspondante.
 
-## Contribution
-
-Les contributions au projet sont les bienvenues. Veuillez suivre les directives de contribution standard pour les projets open source sur GitHub.
-
-## Licence
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
